@@ -1,0 +1,89 @@
+
+{% extends 'base.html' %}
+{% block content %}
+    {% if messages %}
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            {% for message in messages %}
+                <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="true" data-bs-delay="3000">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <a class="btn btn-primary" href="{% url 'recipes:adaugare' %}">Add recipe</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Index</th>
+                <th>Recipe</th>
+                <th>Time</th>
+                <th>Vegetarian</th>
+                <th>Vegan</th>
+                <th>Glutenfree</th>
+                <th>Lactosefree</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for item in recipe_list %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><a href="{% url 'recipes:recipe_detail' item.id %}">{{ item.recipe_name }}</a></td>
+                    <td>{{ item.execution_time }}</td>
+                    <td>{% if item.vegetarian is True %}
+                        <span class="badge bg-success">YES</span>
+                        {% else %}
+                        <span class="badge bg-danger">NO</span>
+                        {% endif %}</td>
+                    <td>{% if item.vegan is True %}
+                        <span class="badge bg-success">YES</span>
+                        {% else %}
+                        <span class="badge bg-danger">NO</span>
+                        {% endif %}</td>
+                    <td>{% if item.glutenfree is True %}
+                        <span class="badge bg-success">YES</span>
+                        {% else %}
+                        <span class="badge bg-danger">NO</span>
+                        {% endif %}</td>
+                    <td>{% if item.lactosefree is True %}
+                        <span class="badge bg-success">YES</span>
+                        {% else %}
+                        <span class="badge bg-danger">NO</span>
+                        {% endif %}</td>
+                    <td>
+                        <a class="btn btn-warning" href="{% url 'recipes:modifica' item.id %}">Edit</a>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ item.id }}">Delete</button>
+                    </td>
+                </tr>
+                </tr>
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteModal{{ item.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ item.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel{{ item.id }}">Confirm Deletion</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the recipe "{{ item.recipe_name }}"?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <form action="{% url 'recipes:stergere' item.id %}" method="POST" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
